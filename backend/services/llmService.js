@@ -1,8 +1,7 @@
 const axios = require("axios");
 
 async function generateAnswer(context, question) {
-
-    const prompt = `
+  const prompt = `
 You are a helpful AI assistant.
 
 Use the provided context to answer the question.
@@ -37,26 +36,41 @@ ${question}
 Answer:
 `;
 
+  try {
+    console.log(
+      "OPENROUTER KEY EXISTS:",
+      !!process.env.OPENROUTER_API_KEY
+    );
+
     const response = await axios.post(
-        "https://openrouter.ai/api/v1/chat/completions",
-        {
-            model: "deepseek/deepseek-chat-v3-0324",
-            messages: [
-                {
-                    role: "user",
-                    content: prompt
-                }
-            ]
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        model: "deepseek/deepseek-chat-v3-0324",
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
         },
-        {
-            headers: {
-                Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-                "Content-Type": "application/json"
-            }
-        }
+      }
     );
 
     return response.data.choices[0].message.content;
+
+  } catch (err) {
+    console.log(
+      "OPENROUTER ERROR:",
+      JSON.stringify(err.response?.data, null, 2)
+    );
+
+    throw err;
+  }
 }
 
 module.exports = generateAnswer;

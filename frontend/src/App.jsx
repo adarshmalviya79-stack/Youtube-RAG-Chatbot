@@ -5,7 +5,6 @@ import ReactMarkdown from "react-markdown";
 import Remarkgfm from "remark-gfm"; 
 
 
-
 function App() {
   const [url, setUrl] = useState("");
   const [question, setQuestion] = useState("");
@@ -15,6 +14,8 @@ function App() {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [videoLoading, setVideoLoading] = useState(false);
   const [currentVideoId, setCurrentVideoId] = useState("");
+  const API_URL = "https://youtube-rag-chatbot-fiaz.onrender.com";
+  
  
 
   const bottomRef = useRef(null);
@@ -46,7 +47,7 @@ function App() {
       const videoId = getVideoId(url);
       setCurrentVideoId(videoId);
 
-      await axios.get(`http://localhost:4000/store/${videoId}`);
+      await axios.get(`${API_URL}/store/${videoId}`);
 
       alert("Video Loaded Successfully");
     } catch (err) {
@@ -62,7 +63,7 @@ function App() {
 
       const videoId = getVideoId(url);
 
-      const res = await axios.get(`http://localhost:4000/summary/${videoId}`);
+      const res = await axios.get(`${API_URL}/summary/${videoId}`);
 
       setSummary(res.data.summary);
     } catch (err) {
@@ -76,7 +77,7 @@ function App() {
     try {
       setLoading(true);
 
-      const res = await axios.get("http://localhost:4000/ask", {
+      const res = await axios.get(`${API_URL}/ask`, {
         params: {
           question,
           videoId:currentVideoId

@@ -1,4 +1,4 @@
-# TubeInsight AI 🎥🤖
+# Youtube RAG Chatbot🎥🤖
 
 TubeInsight AI is a Retrieval-Augmented Generation (RAG) powered application that enables users to interact with YouTube videos through natural language conversations.
 

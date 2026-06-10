@@ -11,14 +11,21 @@ const cosineSimilarity = require("./utils/cosineSimilarity");
 const Chunk = require("./models/Chunk.js");
 const generateContent = require("./services/llmService.js");
 const generateSummary = require("./services/summaryService.js");
+const rateLimit = require("express-rate-limit");
+
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-console.log("Mongo URI exists:", !!process.env.MONGO_URI);
-console.log("DeepSeek key exists:", !!process.env.DEEPSEEK_API_KEY);
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 50,
+  message: "Too many requests. Please try again later."
+});
+
+app.use(limiter);
 
 app.get("/summary/:videoId",async(req,res)=>{
     try{
@@ -132,10 +139,14 @@ app.get("/store/:id", async (req, res) => {
       message: "Stored Successfully"
     });
 
-  } catch(err) {
-    console.log(err);
-    res.status(500).json(err);
-  }
+  } catch (err) {
+  console.log(err);
+
+  res.status(500).json({
+    message:
+      "YouTube temporarily blocked transcript access. Try another video or try again later."
+  });
+}
 });
 app.get("/search", async (req, res) => {
   try {

@@ -14,7 +14,7 @@ function App() {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [videoLoading, setVideoLoading] = useState(false);
   const [currentVideoId, setCurrentVideoId] = useState("");
-  const API_URL = "https://youtube-rag-chatbot-fiaz.onrender.com";
+const API_URL = "https://youtube-rag-chatbot-fiaz.onrender.com";
   
  
 
@@ -35,27 +35,27 @@ function App() {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   }
 
- function getVideoId(url) {
+function getVideoId(url) {
   try {
     const urlObj = new URL(url);
 
-    // youtube.com/watch?v=
+    // Normal youtube links
     const v = urlObj.searchParams.get("v");
     if (v) return v;
 
-    // youtu.be links
+    // youtu.be share links
     if (urlObj.hostname.includes("youtu.be")) {
-      return urlObj.pathname.split("/")[1];
+      return urlObj.pathname.replace("/", "");
     }
 
-    // shorts
+    // Shorts
     if (urlObj.pathname.includes("/shorts/")) {
-      return urlObj.pathname.split("/shorts/")[1];
+      return urlObj.pathname.split("/shorts/")[1].split("?")[0];
     }
 
-    // live
+    // Live videos
     if (urlObj.pathname.includes("/live/")) {
-      return urlObj.pathname.split("/live/")[1];
+      return urlObj.pathname.split("/live/")[1].split("?")[0];
     }
 
     return null;

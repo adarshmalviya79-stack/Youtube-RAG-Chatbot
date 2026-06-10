@@ -17,6 +17,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+console.log("Mongo URI exists:", !!process.env.MONGO_URI);
+console.log("DeepSeek key exists:", !!process.env.DEEPSEEK_API_KEY);
+
 app.get("/summary/:videoId",async(req,res)=>{
     try{
         const chunks = await Chunk.find({

@@ -35,10 +35,34 @@ function App() {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   }
 
-  function getVideoId(url) {
+ function getVideoId(url) {
+  try {
     const urlObj = new URL(url);
-    return urlObj.searchParams.get("v");
+
+    // youtube.com/watch?v=
+    const v = urlObj.searchParams.get("v");
+    if (v) return v;
+
+    // youtu.be links
+    if (urlObj.hostname.includes("youtu.be")) {
+      return urlObj.pathname.split("/")[1];
+    }
+
+    // shorts
+    if (urlObj.pathname.includes("/shorts/")) {
+      return urlObj.pathname.split("/shorts/")[1];
+    }
+
+    // live
+    if (urlObj.pathname.includes("/live/")) {
+      return urlObj.pathname.split("/live/")[1];
+    }
+
+    return null;
+  } catch {
+    return null;
   }
+}
 
   async function loadVideo() {
     try {

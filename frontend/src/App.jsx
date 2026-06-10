@@ -64,22 +64,37 @@ function App() {
   }
 }
 
-  async function loadVideo() {
-    try {
-      setVideoLoading(true);
+async function loadVideo() {
+  try {
+    setVideoLoading(true);
 
-      const videoId = getVideoId(url);
-      setCurrentVideoId(videoId);
+    const videoId = getVideoId(url);
 
-      await axios.get(`${API_URL}/store/${videoId}`);
-
-      alert("Video Loaded Successfully");
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setVideoLoading(false);
+    if (!videoId) {
+      alert("Invalid YouTube URL");
+      return;
     }
+
+    setCurrentVideoId(videoId);
+
+    await axios.get(`${API_URL}/store/${videoId}`, {
+  timeout: 120000,
+});
+
+    alert("Video Loaded Successfully");
+  } catch (err) {
+    console.log(err);
+
+    alert(
+      err.response?.data?.message ||
+      err.response?.data?.error ||
+      err.message ||
+      "Failed to load video"
+    );
+  } finally {
+    setVideoLoading(false);
   }
+}
 
   async function getSummary() {
     try {

@@ -87,9 +87,14 @@ app.get("/ask", async (req, res) => {
       })),
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
-  }
+  console.log("FULL ERROR:");
+
+  console.log(err.response?.data);
+
+  res.status(500).json({
+    message: err.response?.data || err.message
+  });
+}
 });
 
 app.get("/store/:id", async (req, res) => {

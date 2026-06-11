@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { Message, TranscriptChunk } from "../types";
 import { MarkdownRenderer } from "./SummaryCard";
-import { User, Sparkles, Play, Globe, ExternalLink } from "lucide-react";
+import { User, Sparkles, Play, Globe, ExternalLink, Copy } from "lucide-react";
 
 interface MessageBubbleProps {
   key?: string;
@@ -11,6 +12,17 @@ interface MessageBubbleProps {
 
 export default function MessageBubble({ message, onSeek, videoId }: MessageBubbleProps) {
   const isUser = message.sender === "user";
+  const [isCopied, setIsCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(message.text);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy message:", err);
+    }
+  };
 
   const formatSeconds = (totalSecs: number) => {
     const mins = Math.floor(totalSecs / 60);
@@ -38,6 +50,25 @@ export default function MessageBubble({ message, onSeek, videoId }: MessageBubbl
             <span>{isUser ? "You" : "RAG Assistant"}</span>
             <span>•</span>
             <span>{message.timestamp}</span>
+            {!isUser && (
+              <>
+                <span>•</span>
+                <button
+                  onClick={handleCopy}
+                  className="flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer transition-colors"
+                  title="Copy response to clipboard"
+                >
+                  {isCopied ? (
+                    <span className="text-green-500 font-semibold flex items-center gap-0.5">Copied ✓</span>
+                  ) : (
+                    <>
+                      <Copy className="h-3 w-3" />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
+              </>
+            )}
           </div>
 
           {/* Bubble content */}

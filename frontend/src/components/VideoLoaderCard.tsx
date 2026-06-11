@@ -1,14 +1,24 @@
 import React, { useState } from "react";
-import { Play, Search, AlertCircle, Loader2, Sparkles, HelpCircle } from "lucide-react";
+import { Play, Search, AlertCircle, Loader2, Sparkles, HelpCircle, CheckCircle2 } from "lucide-react";
 import { motion } from "motion/react";
 
 interface VideoLoaderCardProps {
   onLoadVideo: (url: string) => void;
-  isLoading: boolean;
+  onGenerateSummary: () => void;
+  isIndexing: boolean;
+  isSummarizing: boolean;
+  isIndexed: boolean;
   error: string | null;
 }
 
-export default function VideoLoaderCard({ onLoadVideo, isLoading, error }: VideoLoaderCardProps) {
+export default function VideoLoaderCard({
+  onLoadVideo,
+  onGenerateSummary,
+  isIndexing,
+  isSummarizing,
+  isIndexed,
+  error
+}: VideoLoaderCardProps) {
   const [url, setUrl] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -45,27 +55,53 @@ export default function VideoLoaderCard({ onLoadVideo, isLoading, error }: Video
             placeholder="e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            disabled={isLoading}
+            disabled={isIndexing}
           />
         </div>
 
-        <button
-          type="submit"
-          className="relative flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/15 hover:from-indigo-500 hover:to-blue-500 hover:shadow-indigo-500/25 active:scale-[0.99] disabled:opacity-70 disabled:scale-100 cursor-pointer transition-all duration-200"
-          disabled={isLoading || !url.trim()}
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="h-4.5 w-4.5 animate-spin" />
-              <span>Analyzing Video and Synthesizing Transcript...</span>
-            </>
-          ) : (
-            <>
-              <Sparkles className="h-4.5 w-4.5 text-yellow-300" />
-              <span>Load, Index & Generate Summary</span>
-            </>
-          )}
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            type="submit"
+            className="relative flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/15 hover:from-indigo-500 hover:to-blue-500 hover:shadow-indigo-500/25 active:scale-[0.99] disabled:opacity-70 disabled:scale-100 cursor-pointer transition-all duration-200"
+            disabled={isIndexing || !url.trim()}
+          >
+            {isIndexing ? (
+              <>
+                <Loader2 className="h-4.5 w-4.5 animate-spin" />
+                <span>Indexing Video...</span>
+              </>
+            ) : isIndexed ? (
+              <>
+                <CheckCircle2 className="h-4.5 w-4.5 text-green-400" />
+                <span>Video Ready</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4.5 w-4.5 text-yellow-300" />
+                <span>Load Video</span>
+              </>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={onGenerateSummary}
+            className="relative flex-1 flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-800 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-all duration-200"
+            disabled={!isIndexed || isSummarizing}
+          >
+            {isSummarizing ? (
+              <>
+                <Loader2 className="h-4.5 w-4.5 animate-spin text-indigo-500" />
+                <span>Generating Summary...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4.5 w-4.5 text-indigo-500" />
+                <span>Generate Summary</span>
+              </>
+            )}
+          </button>
+        </div>
       </form>
 
       {/* Error message */}
@@ -90,21 +126,21 @@ export default function VideoLoaderCard({ onLoadVideo, isLoading, error }: Video
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => handleSampleClick("https://www.youtube.com/watch?v=Ke90Tje7VS0")}
-            disabled={isLoading}
+            disabled={isIndexing}
             className="rounded-lg bg-slate-50 border border-slate-200/60 px-2.5 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:bg-slate-800/40 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all cursor-pointer"
           >
             React 19 Hooks Guide
           </button>
           <button
             onClick={() => handleSampleClick("https://www.youtube.com/watch?v=SqcY0GlETPk")}
-            disabled={isLoading}
+            disabled={isIndexing}
             className="rounded-lg bg-slate-50 border border-slate-200/60 px-2.5 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:bg-slate-800/40 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all cursor-pointer"
           >
             Retrieval-Augmented Generation (RAG) Explained
           </button>
           <button
             onClick={() => handleSampleClick("https://www.youtube.com/watch?v=dQw4w9WgXcQ")}
-            disabled={isLoading}
+            disabled={isIndexing}
             className="rounded-lg bg-slate-50 border border-slate-200/60 px-2.5 py-1.5 text-[11px] font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:bg-slate-800/40 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all cursor-pointer"
           >
             Rick Astley - Never Gonna Give You Up

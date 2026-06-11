@@ -52,7 +52,7 @@ export default function VideoPreviewCard({ videoId, title, author, thumbnailUrl,
         </h3>
 
         <p className="mt-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400">
-          Uploader: <span className="text-slate-850 dark:text-slate-250 font-bold">{author}</span>
+          Uploader: <span className="text-indigo-600 dark:text-indigo-400 font-bold">{author}</span>
         </p>
 
         <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-400 dark:border-slate-850">

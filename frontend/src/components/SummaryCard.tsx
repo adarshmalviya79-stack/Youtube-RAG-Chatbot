@@ -199,7 +199,13 @@ export default function SummaryCard({ summary, onSeek, videoId }: SummaryCardPro
             className="overflow-hidden"
           >
             <div className="mt-4 border-t border-slate-100 pt-4 dark:border-slate-850">
-              <MarkdownRenderer text={summary} onSeek={onSeek} videoId={videoId} />
+              {summary ? (
+                <MarkdownRenderer text={summary} onSeek={onSeek} videoId={videoId} />
+              ) : (
+                <p className="text-xs text-slate-400 dark:text-slate-500 text-center py-4">
+                  No summary generated yet. Click "Generate Summary" above to analyze the video.
+                </p>
+              )}
             </div>
           </motion.div>
         )}

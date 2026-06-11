@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
@@ -22,8 +22,12 @@ export default function App() {
   
   // App core states
   const [videoData, setVideoData] = useState<VideoData | null>(null);
-  const [isLoadingVideo, setIsLoadingVideo] = useState<boolean>(false);
+  const [isIndexing, setIsIndexing] = useState<boolean>(false);
+  const [isSummarizing, setIsSummarizing] = useState<boolean>(false);
   const [videoError, setVideoError] = useState<string | null>(null);
+  const [isSummaryHighlighted, setIsSummaryHighlighted] = useState<boolean>(false);
+
+  const summaryRef = useRef<HTMLDivElement | null>(null);
 
   // Chat states
   const [messages, setMessages] = useState<Message[]>([]);
@@ -73,7 +77,7 @@ export default function App() {
 
   // Endpoint communicator: Load and index YouTube video
   const handleLoadVideo = async (url: string) => {
-    setIsLoadingVideo(true);
+    setIsIndexing(true);
     setVideoError(null);
     // Clear previous video context and chats
     setVideoData(null);
@@ -83,7 +87,7 @@ export default function App() {
     const videoId = extractVideoId(url);
     if (!videoId) {
       setVideoError("Could not parse YouTube Video ID from the provided link. Please enter a valid YouTube URL.");
-      setIsLoadingVideo(false);
+      setIsIndexing(false);
       showToast("Invalid YouTube URL", "error");
       return;
     }
@@ -108,19 +112,13 @@ export default function App() {
       // Call external backend store endpoint to process/index video
       await axios.get(`https://youtube-rag-chatbot-fiaz.onrender.com/store/${videoId}`);
 
-      // Call external backend summary endpoint to retrieve markdown summary
-      const summaryRes = await axios.get(`https://youtube-rag-chatbot-fiaz.onrender.com/summary/${videoId}`);
-      if (summaryRes.status !== 200 || !summaryRes.data) {
-        throw new Error("Failed to retrieve summary from the backend.");
-      }
-
       const loadedVideo: VideoData = {
         videoId,
         title,
         author,
         thumbnailUrl,
         transcript: [], // Managed server-side in the external backend
-        summary: summaryRes.data.summary || "No summary available."
+        summary: "" // Summary is empty until explicitly requested
       };
 
       setVideoData(loadedVideo);
@@ -131,7 +129,7 @@ export default function App() {
         {
           id: "welcome-message",
           sender: "assistant",
-          text: `Hi! I have successfully loaded and completed the RAG (Retrieval-Augmented Generation) indexing for this video.\n\nI have generated a detailed **AI video summary** that you can expand on the left panel.\n\nFeel free to ask me anything about the content of this video! You can click any timestamp citation in my responses, or use the recommended suggestions to start.`,
+          text: `Hi! I have successfully loaded and completed the RAG (Retrieval-Augmented Generation) indexing for this video.\n\nFeel free to ask me anything about the content of this video! You can click any timestamp citation in my responses, or use the recommended suggestions to start.`,
           timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           sources: []
         }
@@ -142,7 +140,41 @@ export default function App() {
       setVideoError(errorMsg);
       showToast(errorMsg, "error");
     } finally {
-      setIsLoadingVideo(false);
+      setIsIndexing(false);
+    }
+  };
+
+  const handleGenerateSummary = async () => {
+    if (!videoData) return;
+    setIsSummarizing(true);
+    try {
+      showToast("Generating summary...", "info");
+      const summaryRes = await axios.get(`https://youtube-rag-chatbot-fiaz.onrender.com/summary/${videoData.videoId}`);
+      if (summaryRes.status !== 200 || !summaryRes.data) {
+        throw new Error("Failed to retrieve summary from the backend.");
+      }
+      
+      const summaryText = summaryRes.data.summary || "No summary available.";
+      setVideoData((prev) => prev ? { ...prev, summary: summaryText } : null);
+      showToast("Summary generated successfully!", "success");
+
+      // Auto Scroll and Highlight summary section
+      setTimeout(() => {
+        summaryRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+        setIsSummaryHighlighted(true);
+        setTimeout(() => {
+          setIsSummaryHighlighted(false);
+        }, 1500);
+      }, 100);
+    } catch (err: any) {
+      console.error(err);
+      const errorMsg = err.response?.data?.error || err.message || "Failed to generate summary.";
+      showToast(errorMsg, "error");
+    } finally {
+      setIsSummarizing(false);
     }
   };
 
@@ -257,7 +289,10 @@ export default function App() {
                 {/* Loader Input section */}
                 <VideoLoaderCard
                   onLoadVideo={handleLoadVideo}
-                  isLoading={isLoadingVideo}
+                  onGenerateSummary={handleGenerateSummary}
+                  isIndexing={isIndexing}
+                  isSummarizing={isSummarizing}
+                  isIndexed={videoData !== null}
                   error={videoError}
                 />
 
@@ -278,16 +313,26 @@ export default function App() {
                     />
 
                     {/* Expandable summary overview */}
-                    <SummaryCard
-                      summary={videoData.summary}
-                      onSeek={handleSeek}
-                      videoId={videoData.videoId}
-                    />
+                    {/* Expandable summary overview with dynamic scroll target and highlight glow */}
+                    <div
+                      ref={summaryRef}
+                      className={`transition-all duration-500 rounded-2xl ${
+                        isSummaryHighlighted
+                          ? "ring-2 ring-indigo-500 ring-offset-2 dark:ring-offset-slate-950 shadow-[0_0_15px_rgba(99,102,241,0.5)] dark:shadow-[0_0_20px_rgba(99,102,241,0.3)] scale-[1.01]"
+                          : "ring-transparent shadow-none scale-100"
+                      }`}
+                    >
+                      <SummaryCard
+                        summary={videoData.summary}
+                        onSeek={handleSeek}
+                        videoId={videoData.videoId}
+                      />
+                    </div>
                   </motion.div>
                 )}
 
                 {/* Simple guide if video isn't loaded */}
-                {!videoData && !isLoadingVideo && (
+                {!videoData && !isIndexing && (
                   <div className="rounded-2xl border border-dashed border-slate-200 bg-white/40 p-6 text-center dark:border-slate-800/80 dark:bg-slate-900/10">
                     <HelpCircle className="mx-auto h-8 w-8 text-slate-400 dark:text-slate-500 animate-pulse" />
                     <h4 className="mt-2 text-xs font-bold text-slate-700 dark:text-slate-300">No active video loaded</h4>

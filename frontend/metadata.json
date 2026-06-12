@@ -2,5 +2,5 @@
   "name": "YouTube RAG Chatbot",
   "description": "Transform YouTube videos into searchable knowledge with interactive transcripts, summaries, and citation-backed Q&A using server-side Retrieval-Augmented Generation.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }

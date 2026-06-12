@@ -17,7 +17,7 @@ export default function Footer() {
             <Heart className="h-3.5 w-3.5 text-indigo-500 fill-indigo-500" />
             <span>by</span>
             <a
-              href="https://linkedin.com/in/adarsh-malviya"
+              href="https://www.linkedin.com/in/adarsh-malviya79"
               target="_blank"
               rel="noreferrer"
               className="font-bold text-slate-650 hover:text-indigo-650 dark:text-slate-400 dark:hover:text-indigo-450 transition-colors"

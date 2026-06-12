@@ -54,7 +54,7 @@ export default function Navbar({ currentView, onNavigate, darkMode, onToggleThem
             {/* Social Links */}
             <div className="flex items-center gap-3">
               <a
-                href="https://github.com/adarshmalviya"
+                href="https://github.com/adarshmalviya79-stack"
                 target="_blank"
                 rel="noreferrer"
                 className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all"
@@ -63,7 +63,7 @@ export default function Navbar({ currentView, onNavigate, darkMode, onToggleThem
                 <Github className="h-4.5 w-4.5" />
               </a>
               <a
-                href="https://linkedin.com/in/adarsh-malviya"
+                href="https://www.linkedin.com/in/adarsh-malviya79"
                 target="_blank"
                 rel="noreferrer"
                 className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all"
@@ -143,7 +143,7 @@ export default function Navbar({ currentView, onNavigate, darkMode, onToggleThem
 
             <div className="flex items-center justify-around py-2">
               <a
-                href="https://github.com/adarshmalviya"
+                href="https://github.com/adarshmalviya79-stack"
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
@@ -151,7 +151,7 @@ export default function Navbar({ currentView, onNavigate, darkMode, onToggleThem
                 <Github className="h-4 w-4" /> GitHub
               </a>
               <a
-                href="https://linkedin.com/in/adarsh-malviya"
+                href="https://www.linkedin.com/in/adarsh-malviya79"
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
